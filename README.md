@@ -133,3 +133,8 @@ The above would give you a prompt like the following:
 ```
 [06:40 PM][~/dir][master]> 
 ```
+
+## Known Weirdness
+
+* Yes, you're root. Get over it, you're in a container
+* ZSH won't work with mouse scrolling "out-of-the-box". Add `setw -g mode-mouse on` to a `~/.tmux.conf` and restart your terminals.

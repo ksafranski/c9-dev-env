@@ -6,13 +6,13 @@ This image contains a complete development environment utilizing Cloud9 IDE insi
 
 ```
 docker run -d \ 
-	-v /var/run/docker.sock:/var/run/docker.sock \
-	-v ~/dev-env-home/:/root \
-	-v ~/workspace/:/workspace \
-	-p 8000-8020:8000-8020 \
-	-e C9USER=user -e C9PASS=welcome -e C9PORT=8888 \
-	-p 8888:8888 \
-	fluidbyte/c9-dev-env
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v ~/dev-env-home/:/root \
+  -v ~/workspace/:/workspace \
+  -p 8000-8020:8000-8020 \
+  -e C9USER=user -e C9PASS=welcome -e C9PORT=8888 \
+  -p 8888:8888 \
+  fluidbyte/c9-dev-env
 ```
 
 The above does the following (line-by-line):

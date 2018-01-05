@@ -10,7 +10,7 @@ docker run -d \
 	-v ~/dev-env-home/:/root \
 	-v ~/workspace/:/workspace \
 	-p 8000-8020:8000-8020 \
-	-e C9USER=kent -e C9PASS=welcome -e C9PORT=8888 \
+	-e C9USER=user -e C9PASS=welcome -e C9PORT=8888 \
 	-p 8888:8888 \
 	fluidbyte/c9-dev-env
 ```
@@ -49,7 +49,7 @@ _Similar to the line above, this saves the files in the dev environment to the h
 _This is optional, but setting a range of open ports allows you to utilize these, for example, when testing a running service in the dev environment._
 
 ```
--e C9USER=kent -e C9PASS=welcome -e C9PORT=8888
+-e C9USER=user -e C9PASS=welcome -e C9PORT=8888
 ```
 
 **Sets the `C9USER`, `C9PASS` and `C9PORT` settings on which Cloud9 will run**

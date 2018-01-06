@@ -2,6 +2,10 @@
 
 This image contains a complete development environment utilizing Cloud9 IDE inside a Ubuntu container to provide everything needed to setup a development environment. It includes Cloud9, but also adds some common utilities in Ubuntu, Vim, and Git.
 
+## Concept
+
+The idea behind this image is to build a development environment that is/can be web-based, accessible anywhere, as well as portable, ephemeral, and flexible.
+
 ## Usage
 
 ```
@@ -64,77 +68,20 @@ p 8888:8888
 
 _Makes C9 available locally at the port designated_
 
-## Home Directory and User Customization
+## Customization and Profile
 
-As mentioned above, you can mount a folder on the host to the container's `/root`. This will allow you to configure Git, Vim, Bash, etc.
+It's important to be able to customize a development environment. By creating a mounted volume from your host to the `/root` profile directory, you are able to customize the shell (supports `sh`, `bash`, and `zsh`) with things like [bash-it](https://github.com/Bash-it/bash-it), [sexy-bash-prompt](https://github.com/twolfson/sexy-bash-prompt), or [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh).
 
-For example, you can customize bash by creating a `.bash_profile` with the following:
+_Note: If you're using ZSH, C9 has issues with mouse scrolling in the terminal. To resolve, create a file `~/.tmux.conf` =, add the following; `setw -g mode-mouse on`, then restart any open terminals._
 
-```bash
-if [ -f ~/.bashrc ]; then
-    . ~/.bashrc
-fi
-```
+## Docker-In-Docker
 
-Then a basic `.bashrc` with Git support:
+While the image itself is ephemeral (except the home folder and workspace that are mounted) there are several options for maintaining state (i.e. not loosing things on restart). You can mount volumes to specific paths if needed though the better solution is to utilize Docker.
 
-```bash
-function parse_git_branch() {
-	BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
-	if [ ! "${BRANCH}" == "" ]
-	then
-		STAT=`parse_git_dirty`
-		echo "[${BRANCH}${STAT}]"
-	else
-		echo ""
-	fi
-}
+Tools such as [Binci](https://github.com/binci/binci) or [Docker-Compose](https://docs.docker.com/compose/) allow for running other needed binaries, configurations, databases, etc inside containers during development.
 
-function parse_git_dirty {
-	status=`git status 2>&1 | tee`
-	dirty=`echo -n "${status}" 2> /dev/null | grep "modified:" &> /dev/null; echo "$?"`
-	untracked=`echo -n "${status}" 2> /dev/null | grep "Untracked files" &> /dev/null; echo "$?"`
-	ahead=`echo -n "${status}" 2> /dev/null | grep "Your branch is ahead of" &> /dev/null; echo "$?"`
-	newfile=`echo -n "${status}" 2> /dev/null | grep "new file:" &> /dev/null; echo "$?"`
-	renamed=`echo -n "${status}" 2> /dev/null | grep "renamed:" &> /dev/null; echo "$?"`
-	deleted=`echo -n "${status}" 2> /dev/null | grep "deleted:" &> /dev/null; echo "$?"`
-	bits=''
-	if [ "${renamed}" == "0" ]; then
-		bits=">${bits}"
-	fi
-	if [ "${ahead}" == "0" ]; then
-		bits="*${bits}"
-	fi
-	if [ "${newfile}" == "0" ]; then
-		bits="+${bits}"
-	fi
-	if [ "${untracked}" == "0" ]; then
-		bits="?${bits}"
-	fi
-	if [ "${deleted}" == "0" ]; then
-		bits="x${bits}"
-	fi
-	if [ "${dirty}" == "0" ]; then
-		bits="!${bits}"
-	fi
-	if [ ! "${bits}" == "" ]; then
-		echo " ${bits}"
-	else
-		echo ""
-	fi
-}
+## Security
 
-export PS1="[\[\e[34m\]\@\[\e[m\]][\[\e[36m\]\w\[\e[m\]]\`parse_git_branch\`> "
+The image follows the standard Docker convention of using the `root` user as the default user in the container. This is safe if you're following best practices for Docker security (i.e. not exposing services which could be hijacked). Additionally, shutting down the container when not in use is good practice.
 
-```
-
-The above would give you a prompt like the following:
-
-```
-[06:40 PM][~/dir][master]> 
-```
-
-## Known Weirdness
-
-* Yes, you're root. Get over it, you're in a container
-* ZSH won't work with mouse scrolling "out-of-the-box". Add `setw -g mode-mouse on` to a `~/.tmux.conf` and restart your terminals.
+Ultimately, if serving publicly, it's also advisable to use a tool like [Let's Encrypt](https://letsencrypt.org/) and [nginx](https://www.nginx.com/) to setup [an SSL via proxy service](https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04) on your exposed instance.
